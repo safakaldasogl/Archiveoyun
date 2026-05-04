@@ -1,0 +1,15 @@
+!!brut.androlib.meta.MetaInfo
+compileSdkVersion: '23'
+compileSdkVersionCodename: 6.0-2438415
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '21'
+  targetSdkVersion: '23'
+sharedLibrary: false
+sparseResources: false
+version: 2.7.0
+versionInfo:
+  versionCode: '1'
+  versionName: 1.0

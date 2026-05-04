@@ -1,0 +1,5 @@
+build/
+apk_build/
+classes.dex
+resources.ap_
+*.orig
