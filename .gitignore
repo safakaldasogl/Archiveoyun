@@ -1,4 +1,6 @@
 android-app/resources.ap_
+android-app/resources2.ap_
+android-app/compiled/
 archive-oyun-debug.apk
 archive-oyun-debug.apk.b64
 *.idsig
