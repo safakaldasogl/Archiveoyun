@@ -524,25 +524,26 @@
     position: relative;
   }
   .more-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
+    position: fixed;
+    top: 0; right: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 6px;
     min-width: 190px;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.45);
-    z-index: 1000;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+    z-index: 99999;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-6px);
+    transform: translateY(-6px) scale(0.97);
     transition: opacity 0.15s ease, transform 0.18s cubic-bezier(.4,0,.2,1), visibility 0.15s;
+    pointer-events: none;
   }
   .more-menu.open {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
   }
   .more-menu-item {
     display: flex;
@@ -4617,6 +4618,44 @@ button:active { opacity: 0.8; }
 /* Scroll bar gizle mobilde */
 ::-webkit-scrollbar { width: 0px; background: transparent; }
 
+  /* Screenshot skeleton & hızlı yükleme */
+  .detail-screenshot {
+    position: relative;
+    overflow: hidden;
+    background: var(--card);
+    border-radius: 8px;
+  }
+  .detail-screenshot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmerLoad 1.2s infinite;
+    z-index: 1;
+  }
+  .detail-screenshot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    position: relative;
+    z-index: 2;
+  }
+  .detail-screenshot img.loaded {
+    opacity: 1;
+  }
+  .detail-screenshot img.loaded ~ ::before,
+  .detail-screenshot.img-loaded::before {
+    display: none;
+  }
+  @keyframes shimmerLoad {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+
 </style>
 <script defer>
 /* Chart.js 4.4.0 - embedded */
@@ -5663,7 +5702,16 @@ function setSortDropdown(val, label) {
 function toggleMoreMenu(e) {
   if (e) e.stopPropagation();
   const menu = document.getElementById('moreMenu');
-  if (!menu) return;
+  const btn  = e ? e.currentTarget : document.getElementById('moreMenuWrap');
+  if (!menu || !btn) return;
+  const isOpen = menu.classList.contains('open');
+  if (!isOpen) {
+    // Butona göre pozisyon hesapla
+    const rect = btn.getBoundingClientRect();
+    menu.style.top  = (rect.bottom + 8) + 'px';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+    menu.style.left  = 'auto';
+  }
   menu.classList.toggle('open');
 }
 function closeMoreMenu() {
@@ -7746,7 +7794,25 @@ function renderQuizRating() {
             <button class="quiz-qp-btn" onclick="setQuizRatingFromInput(${v})">${v}</button>
           `).join('')}
         </div>
-        <button class="quiz-save-btn" onclick="saveQuizRating()">Kaydet &amp; Devam →</button>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:0.5px;">DURUM / KATEGORİ</label>
+            <select id="quizStatusSelect" style="width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:13px;cursor:pointer;outline:none;transition:border-color 0.15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+              <option value="finished">🍽️ Bitirdim</option>
+              <option value="playing">🍴 Şu an Oynuyorum</option>
+              <option value="platinum">🍰 %100 Tamamladım</option>
+              <option value="replaying">🥄 Tekrar Oynadım</option>
+              <option value="shelved">🥡 Askıya Aldım</option>
+              <option value="dropped">🤷 Yarıda Bıraktım</option>
+              <option value="abandoned">💩 Sildim Gitti</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:0.5px;">İNCELEME / NOTLAR <span style="font-weight:400;color:var(--muted);font-size:11px;">(isteğe bağlı)</span></label>
+            <textarea id="quizNotesInput" placeholder="Bu oyun hakkında ne düşünüyorsun? Hikayesi, grafikleri, oynanışı..." rows="3" style="width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:13px;resize:vertical;min-height:70px;outline:none;transition:border-color 0.15s;line-height:1.5;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+          </div>
+        </div>
+        <button class="quiz-save-btn" style="margin-top:12px;" onclick="saveQuizRating()">Kaydet &amp; Devam →</button>
         <button onclick="openNextQuiz()" style="width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px;transition:var(--transition);" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Şimdilik atla →</button>
       </div>
     </div>
@@ -7818,6 +7884,8 @@ async function saveQuizRating() {
   if (_quizRating === 0) {
     if (!confirm('0 puan vermek istiyor musun?')) return;
   }
+  const _quizStatus = document.getElementById('quizStatusSelect')?.value || 'finished';
+  const _quizNotes  = document.getElementById('quizNotesInput')?.value?.trim() || '';
   const g = _quizCurrent;
   const data = await getData();
 
@@ -7836,14 +7904,15 @@ async function saveQuizRating() {
   if (idx !== -1) {
     // Zaten oynananlar listesinde
     data.played[idx].rating = String(_quizRating);
-    if (!data.played[idx].status) data.played[idx].status = 'finished';
+    data.played[idx].status = _quizStatus;
+    if (_quizNotes) data.played[idx].notes = _quizNotes;
   } else {
     // İstek listesinde mi?
     let wi = g.id ? data.wishlist.findIndex(x => x.id === g.id) : -1;
     if (wi === -1 && slug) wi = data.wishlist.findIndex(x => x.rawgSlug === slug);
     if (wi !== -1) {
       const [moved] = data.wishlist.splice(wi, 1);
-      data.played.unshift({ ...moved, rating: String(_quizRating), status: 'finished' });
+      data.played.unshift({ ...moved, rating: String(_quizRating), status: _quizStatus, ...((_quizNotes) && { notes: _quizNotes }) });
     } else {
       // Tamamen yeni (RAWG'dan geldi, kütüphanede yok) — direkt ekle
       data.played.unshift({
@@ -7856,7 +7925,8 @@ async function saveQuizRating() {
         metacritic: g.metacritic || null,
         released: g.released || null,
         rating: String(_quizRating),
-        status: 'finished',
+        status: _quizStatus,
+        notes: _quizNotes,
         createdAt: Date.now()
       });
     }
@@ -9326,6 +9396,29 @@ var _debouncedFilter = debounce(filterGames, 250);
     };
   }
 })();
+</script>
+
+
+<script>
+// Screenshot hızlı yükleme: img yüklenince görünür yap
+function initScreenshotLoading() {
+  document.querySelectorAll('.detail-screenshot img').forEach((img, i) => {
+    if (img.complete && img.naturalWidth) {
+      img.classList.add('loaded');
+      img.closest('.detail-screenshot')?.classList.add('img-loaded');
+    } else {
+      img.addEventListener('load', function() {
+        this.classList.add('loaded');
+        this.closest('.detail-screenshot')?.classList.add('img-loaded');
+      });
+      img.addEventListener('error', function() {
+        this.closest('.detail-screenshot').style.display = 'none';
+      });
+    }
+  });
+}
+// Detail açıldığında çalıştır
+const _origRenderDetailContent = window.renderDetailContent;
 </script>
 
 </body>
