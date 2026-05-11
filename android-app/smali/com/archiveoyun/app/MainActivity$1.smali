@@ -4,17 +4,16 @@
 .field final synthetic this$0:Lcom/archiveoyun/app/MainActivity;
 
 .method constructor <init>(Lcom/archiveoyun/app/MainActivity;)V
-    # p0=this, p1=outer  => 2 params
-    # .registers 2 => no locals, params: v0=p0, v1=p1
     .registers 2
-    iput-object p1, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
+    # super() ÖNCE çağrılmalı, sonra field yazılabilir
     invoke-direct {p0}, Landroid/webkit/WebChromeClient;-><init>()V
+    iput-object p1, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
     return-void
 .end method
 
 .method public onShowFileChooser(Landroid/webkit/WebView;Landroid/webkit/ValueCallback;Landroid/webkit/WebChromeClient$FileChooserParams;)Z
     # p0=this, p1=webView, p2=filePathCallback, p3=fileChooserParams  => 4 params
-    # .registers 8 => locals: v0..v3, params: v4=p0, v5=p1, v6=p2, v7=p3
+    # .registers 8 => locals v0..v3, params p0=v4 p1=v5 p2=v6 p3=v7
     .registers 8
 
     # Önceki callback varsa null ile iptal et
@@ -35,11 +34,11 @@
     invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
     const-string v2, "*/*"
     invoke-virtual {v1, v2}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
+    move-result-object v2
 
-    # Activity.startActivityForResult(intent, 1)
     iget-object v3, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
-    const/4 v2, 0x1
-    invoke-virtual {v3, v1, v2}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
+    const/4 v0, 0x1
+    invoke-virtual {v3, v1, v0}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
 
     const/4 v0, 0x1
     return v0
