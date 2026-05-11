@@ -9170,11 +9170,11 @@ function openModal(id = null) {
 
   if (id) {
     getData().then(data => {
-      let g = data[currentTab].find(x => x.id === id);
+      let g = data[currentTab].find(x => String(x.id) === String(id));
       let foundTab = currentTab;
       if (!g) {
         const otherTab = currentTab === 'played' ? 'wishlist' : 'played';
-        g = data[otherTab].find(x => x.id === id);
+        g = data[otherTab].find(x => String(x.id) === String(id));
         if (g) foundTab = otherTab;
       }
       if (!g) { showToast('Oyun bulunamadı', 'error'); return; }
@@ -9311,7 +9311,7 @@ async function saveGame() {
     const targetTab = editingId ? (editingTab || currentTab) : currentTab;
 
     if (editingId) {
-      const idx = data[targetTab].findIndex(x => x.id === editingId);
+      const idx = data[targetTab].findIndex(x => String(x.id) === String(editingId));
       if (idx !== -1) {
         const oldCreatedAt = data[targetTab][idx].createdAt;
         data[targetTab][idx] = { ...buildGame(imageData), createdAt: oldCreatedAt };
@@ -9367,10 +9367,10 @@ async function saveGame() {
 async function deleteGame(id) {
   const data = await getData();
   let tab = currentTab;
-  let idx = data[tab].findIndex(x => x.id === id);
+  let idx = data[tab].findIndex(x => String(x.id) === String(id));
   if (idx === -1) {
     tab = tab === 'played' ? 'wishlist' : 'played';
-    idx = data[tab].findIndex(x => x.id === id);
+    idx = data[tab].findIndex(x => String(x.id) === String(id));
   }
   if (idx === -1) return;
 
@@ -9445,10 +9445,10 @@ function hideUndoToast() {
 async function moveGame(id) {
   const data = await getData();
   let from = currentTab;
-  let idx  = data[from].findIndex(x => x.id === id);
+  let idx  = data[from].findIndex(x => String(x.id) === String(id));
   if (idx === -1) {
     from = from === 'played' ? 'wishlist' : 'played';
-    idx  = data[from].findIndex(x => x.id === id);
+    idx  = data[from].findIndex(x => String(x.id) === String(id));
   }
   if (idx === -1) return;
   const to = from === 'played' ? 'wishlist' : 'played';
@@ -9874,8 +9874,8 @@ function initWishlistDrag() {
 
       const data = await getData();
       const list = data.wishlist || [];
-      const srcIdx = list.findIndex(g => g.id === srcId);
-      const dstIdx = list.findIndex(g => g.id === dstId);
+      const srcIdx = list.findIndex(g => String(g.id) === String(srcId));
+      const dstIdx = list.findIndex(g => String(g.id) === String(dstId));
       if (srcIdx < 0 || dstIdx < 0) return;
 
       // Sırala
@@ -11402,10 +11402,10 @@ let _detailRawgCache = {};
 async function openDetail(gameId) {
   const data = await getData();
   // Hem played hem wishlist'te ara
-  let game = data.played.find(g => g.id === gameId);
+  let game = data.played.find(g => String(g.id) === String(gameId));
   let tab = 'played';
   if (!game) {
-    game = data.wishlist.find(g => g.id === gameId);
+    game = data.wishlist.find(g => String(g.id) === String(gameId));
     tab = 'wishlist';
   }
   if (!game) return;
@@ -11713,7 +11713,7 @@ async function addSession(e, gameId) {
 
   const data = await getData();
   // Sadece played sekmesinde işliyoruz
-  const idx = data.played.findIndex(g => g.id === gameId);
+  const idx = data.played.findIndex(g => String(g.id) === String(gameId));
   if (idx === -1) return;
 
   if (!Array.isArray(data.played[idx].sessions)) data.played[idx].sessions = [];
@@ -11741,7 +11741,7 @@ async function addSession(e, gameId) {
 
 async function deleteSession(gameId, sessionId) {
   const data = await getData();
-  const idx = data.played.findIndex(g => g.id === gameId);
+  const idx = data.played.findIndex(g => String(g.id) === String(gameId));
   if (idx === -1) return;
   if (!Array.isArray(data.played[idx].sessions)) return;
   data.played[idx].sessions = data.played[idx].sessions.filter(s => s.id !== sessionId);
@@ -14887,7 +14887,7 @@ function filterCompareList(slot, query) {
 }
 
 function selectCompareGame(slot, id) {
-  const game = _compareAllGames.find(g => g.id === id);
+  const game = _compareAllGames.find(g => String(g.id) === String(id));
   if (!game) return;
   _compareSelected[slot - 1] = game;
   document.getElementById('cmpList' + slot).style.display = 'none';
@@ -16485,9 +16485,9 @@ async function openMovieModal(id) {
   if (id) {
     document.getElementById('movieModalTitle').textContent = 'Film / Dizi Düzenle';
     const data = await getMovieData();
-    let m = data.watched.find(x => x.id === id);
+    let m = data.watched.find(x => String(x.id) === String(id));
     if (m) { editingMovieTab = 'watched'; }
-    else { m = data.watchlist.find(x => x.id === id); if (m) editingMovieTab = 'watchlist'; }
+    else { m = data.watchlist.find(x => String(x.id) === String(id)); if (m) editingMovieTab = 'watchlist'; }
     if (!m) return;
 
     document.getElementById('fMovieTitle').value    = m.title     || '';
@@ -16628,10 +16628,10 @@ async function saveMovie() {
 
     if (editingMovieId) {
       // Önceki konumdan çıkar
-      const fromTab = editingMovieTab && data[editingMovieTab]?.some(x => x.id === editingMovieId)
+      const fromTab = editingMovieTab && data[editingMovieTab]?.some(x => String(x.id) === String(editingMovieId))
         ? editingMovieTab
-        : (data.watched?.some(x => x.id === editingMovieId) ? 'watched' : 'watchlist');
-      const fromIdx = data[fromTab]?.findIndex(x => x.id === editingMovieId);
+        : (data.watched?.some(x => String(x.id) === String(editingMovieId)) ? 'watched' : 'watchlist');
+      const fromIdx = data[fromTab]?.findIndex(x => String(x.id) === String(editingMovieId));
       let oldCreatedAt = Date.now();
       if (fromIdx !== -1 && fromIdx !== undefined) {
         oldCreatedAt = data[fromTab][fromIdx].createdAt || oldCreatedAt;
@@ -17094,9 +17094,9 @@ document.addEventListener('click', (e) => {
 async function incrementEpisode(id, btn) {
   const data = await getMovieData();
   // Her iki listede de ara (izledim ve izleyeceğim)
-  let m = data.watched.find(x => x.id === id);
+  let m = data.watched.find(x => String(x.id) === String(id));
   let inWatched = !!m;
-  if (!m) m = data.watchlist.find(x => x.id === id);
+  if (!m) m = data.watchlist.find(x => String(x.id) === String(id));
   if (!m) return;
   const totalEps  = m.totalEpisodes  || 0;
   const totalSeas = m.totalSeasons   || 1;
@@ -17120,7 +17120,7 @@ async function incrementEpisode(id, btn) {
   m.currentEpisode = curEp;
   // İzleyeceklerimden bir bölüm artırıldıysa, otomatik "izliyorum"a taşı
   if (!inWatched) {
-    const idx = data.watchlist.findIndex(x => x.id === id);
+    const idx = data.watchlist.findIndex(x => String(x.id) === String(id));
     if (idx !== -1) {
       const [moved] = data.watchlist.splice(idx, 1);
       moved.status = 'watching';
@@ -17158,7 +17158,7 @@ async function incrementEpisode(id, btn) {
 // ═══════════════════════════════════════════════════════════
 async function openMovieDetail(id) {
   const data = await getMovieData();
-  const m    = [...data.watched, ...data.watchlist].find(x => x.id === id);
+  const m    = [...data.watched, ...data.watchlist].find(x => String(x.id) === String(id));
   if (!m) return;
 
   const isTV  = m.mediaType === 'series';
@@ -17399,7 +17399,7 @@ document.addEventListener('click', async (e) => {
 const _similarMoviesCache = new Map(); // tmdbId:mediaType → [items]
 async function openSimilarMovies(id) {
   const data = await getMovieData();
-  const m    = [...data.watched, ...data.watchlist].find(x => x.id === id);
+  const m    = [...data.watched, ...data.watchlist].find(x => String(x.id) === String(id));
   if (!m || !m.tmdbId) {
     showToast('Önce TMDB ile eşle (düzenle → öneriler).', 'error');
     return;
@@ -17766,10 +17766,10 @@ let _movieUndoState = null;
 async function deleteMovie(id) {
   const data = await getMovieData();
   let tab = currentMovieTab;
-  let idx = data[tab].findIndex(x => x.id === id);
+  let idx = data[tab].findIndex(x => String(x.id) === String(id));
   if (idx === -1) {
     tab = tab === 'watched' ? 'watchlist' : 'watched';
-    idx = data[tab].findIndex(x => x.id === id);
+    idx = data[tab].findIndex(x => String(x.id) === String(id));
   }
   if (idx === -1) return;
 
@@ -17802,10 +17802,10 @@ async function deleteMovie(id) {
 async function moveMovie(id) {
   const data = await getMovieData();
   let from = currentMovieTab;
-  let idx  = data[from].findIndex(x => x.id === id);
+  let idx  = data[from].findIndex(x => String(x.id) === String(id));
   if (idx === -1) {
     from = from === 'watched' ? 'watchlist' : 'watched';
-    idx  = data[from].findIndex(x => x.id === id);
+    idx  = data[from].findIndex(x => String(x.id) === String(id));
   }
   if (idx === -1) return;
   const to = from === 'watched' ? 'watchlist' : 'watched';
