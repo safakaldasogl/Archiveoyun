@@ -8,7 +8,7 @@
 <meta name="description" content="Kişisel oyun kütüphanen. Puan ver, takip et, paylaş.">
 
 <!-- §PWA — App-like davranış + ana ekrana ekleme -->
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Archi%22%2C%22short_name%22%3A%22Archi%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%230c0e14%22%2C%22theme_color%22%3A%22%230c0e14%22%2C%22description%22%3A%22Ki%C5%9Fisel%20oyun%20k%C3%BCt%C3%BCphanen%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%2520viewBox%253D%25220%25200%2520512%2520512%2522%253E%253Crect%2520width%253D%2522512%2522%2520height%253D%2522512%2522%2520fill%253D%2522%25235b8fff%2522%2520rx%253D%2522110%2522%252F%253E%253Ctext%2520x%253D%2522256%2522%2520y%253D%2522340%2522%2520font-size%253D%2522260%2522%2520text-anchor%253D%2522middle%2522%2520fill%253D%2522white%2522%253E%25F0%259F%258E%25AE%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Archi%22%2C%22short_name%22%3A%22Archi%22%2C%22start_url%22%3A%22Archivos.html%22%2C%22scope%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%230c0e14%22%2C%22theme_color%22%3A%22%230c0e14%22%2C%22description%22%3A%22Ki%C5%9Fisel%20oyun%20k%C3%BCt%C3%BCphanen%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%2520viewBox%253D%25220%25200%2520512%2520512%2522%253E%253Crect%2520width%253D%2522512%2522%2520height%253D%2522512%2522%2520fill%253D%2522%25235b8fff%2522%2520rx%253D%2522110%2522%252F%253E%253Ctext%2520x%253D%2522256%2522%2520y%253D%2522340%2522%2520font-size%253D%2522260%2522%2520text-anchor%253D%2522middle%2522%2520fill%253D%2522white%2522%253E%25F0%259F%258E%25AE%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Archi">
@@ -2440,12 +2440,12 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 24px;
-    padding: 28px;
+    padding: 24px 20px;
     width: min(540px, 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     position: relative;
     animation: spinBoxEnter 0.4s cubic-bezier(.4,0,.2,1);
     margin: auto;
@@ -2545,10 +2545,9 @@
   /* Çark görseli */
   .wheel-wrap {
     position: relative;
-    width: 320px;
-    height: 320px;
-    max-width: 90vw;
-    max-height: 90vw;
+    width: min(300px, calc(100vw - 120px));
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6077,6 +6076,92 @@
     border-color: rgba(91,143,255,0.35);
   }
 
+  /* ── §DISC_FILTER_BAR — Pro chip + sort tek satır ── */
+  .disc-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    flex-wrap: nowrap;
+  }
+  .disc-filter-bar::-webkit-scrollbar { display: none; }
+  .disc-chip {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    padding: 0 13px;
+    height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: all 0.14s ease;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .disc-chip:hover:not(.active) {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.14);
+    color: #c4cce0;
+  }
+  .disc-chip.active {
+    background: rgba(91,143,255,0.16);
+    border-color: rgba(91,143,255,0.38);
+    color: #89b4ff;
+    box-shadow: 0 0 12px -4px rgba(91,143,255,0.35);
+  }
+  .disc-sort-divider {
+    flex-shrink: 0;
+    width: 1px;
+    height: 18px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 2px;
+  }
+  .disc-sort-select {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.14s ease;
+  }
+  .disc-sort-select:hover, .disc-sort-select:focus {
+    border-color: rgba(91,143,255,0.3);
+    color: var(--text);
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* ── §SPIN_SCROLL_FIX — Çark overlay scroll sorunu ── */
+  .spin-overlay {
+    align-items: flex-start !important;
+    padding: 20px !important;
+  }
+  .spin-box {
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+    margin: auto;
+  }
+  .spin-box::-webkit-scrollbar { width: 4px; }
+  .spin-box::-webkit-scrollbar-track { background: transparent; }
+  .spin-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+
   /* Mobile movie page tweaks */
   @media (max-width: 700px) {
     #moviesPage { padding: 0 14px 60px; }
@@ -6087,6 +6172,7 @@
     #movieDashboard .stat-label { font-size: 9.5px; letter-spacing: 0.4px; }
     .movie-quick-filters { gap: 5px; }
     .movie-quick-filter { padding: 4px 10px; font-size: 11.5px; }
+    .spin-box { max-height: calc(100dvh - 32px); }
   }
 
   /* §SKELETON — Yükleme placeholder */
@@ -7080,9 +7166,20 @@
     box-shadow: 0 12px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) !important;
   }
 
-  /* Sayfa geçişi — smooth fade */
+  /* ⚡ Sayfa geçişi — anında, sadece minik bir tazelik için kısa fade */
   #libraryPage, #discoverPage, #moviesPage {
-    transition: opacity 0.22s ease;
+    /* 220ms drop yaratıyordu; 0ms artık tepkisel */
+    transition: none;
+  }
+  /* Yeni aktif olan sayfa için minik bir "in" animasyonu (jank yaratmaz, GPU katmanı) */
+  @keyframes pageSnapIn {
+    from { opacity: 0.5; transform: translate3d(0, 4px, 0); }
+    to   { opacity: 1;   transform: translate3d(0, 0, 0); }
+  }
+  #libraryPage:not([style*="display: none"]),
+  #discoverPage.active,
+  #moviesPage.active {
+    animation: pageSnapIn 0.14s cubic-bezier(.2,0,.1,1);
   }
 
   /* Skeleton yükleme efekti (gerekli yerler için) */
@@ -7554,32 +7651,18 @@
     <button id="discoverSearchClear" onclick="clearDiscoverSearch()" style="display:none;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;font-size:16px;">✕</button>
   </div>
 
-  <div class="discover-filters">
-    <button class="discover-filter active" data-discover="recent" onclick="loadDiscover('recent')">
-      🆕 Son 60 Gün
-    </button>
-    <button class="discover-filter" data-discover="upcoming" onclick="loadDiscover('upcoming')">
-      📅 Yakında Gelecek
-    </button>
-    <button class="discover-filter" data-discover="hot" onclick="loadDiscover('hot')">
-      🔥 Bu Aralar Popüler
-    </button>
-    <button class="discover-filter" data-discover="year" onclick="loadDiscover('year')">
-      ⭐ Tüm Zamanların Enleri
-    </button>
-  </div>
-
-  <!-- KEŞFET SIRALAMA -->
-  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;flex-wrap:wrap;">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-    <select id="discoverSortSelect" onchange="onDiscoverSortChange(this.value)" style="min-width:160px;width:auto;flex:0;font-size:13px;padding:7px 12px;">
-      <option value="default">Varsayılan Sıra</option>
-      <option value="rating_desc">⭐ Puana Göre (Yüksek→Düşük)</option>
-      <option value="rating_asc">⭐ Puana Göre (Düşük→Yüksek)</option>
+  <div class="disc-filter-bar">
+    <button class="disc-chip active" data-discover="recent" onclick="loadDiscover('recent')">🆕 Son 60 Gün</button>
+    <button class="disc-chip" data-discover="upcoming" onclick="loadDiscover('upcoming')">📅 Yakında</button>
+    <button class="disc-chip" data-discover="hot" onclick="loadDiscover('hot')">🔥 Popüler</button>
+    <button class="disc-chip" data-discover="year" onclick="loadDiscover('year')">⭐ En İyiler</button>
+    <div class="disc-sort-divider"></div>
+    <select id="discoverSortSelect" onchange="onDiscoverSortChange(this.value)" class="disc-sort-select">
+      <option value="default">Varsayılan</option>
+      <option value="rating_desc">⭐ Yüksek Puan</option>
       <option value="name_asc">🔤 A–Z</option>
-      <option value="name_desc">🔤 Z–A</option>
-      <option value="date_desc">📅 Tarih (Yeni→Eski)</option>
-      <option value="date_asc">📅 Tarih (Eski→Yeni)</option>
+      <option value="date_desc">📅 Yeni → Eski</option>
+      <option value="date_asc">📅 Eski → Yeni</option>
     </select>
   </div>
 
@@ -7677,18 +7760,27 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Ne İzlesem?</span>
     </button>
-    <button class="tool-btn" id="btnMovieQuiz" onclick="startMovieQuiz()" title="Film/Dizi Quiz — Tarayıp puanla">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>Quiz</span>
-    </button>
-    <button class="tool-btn" onclick="openMovieWrapped()" title="Yıl Özeti">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <span>Özet</span>
-    </button>
-    <button class="tool-btn" onclick="exportMovieData()" title="Dışa Aktar">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span>Dışa Aktar</span>
-    </button>
+    <!-- Daha fazla menüsü (film) -->
+    <div class="more-menu-wrap" id="movieMoreMenuWrap">
+      <button class="tool-btn" onclick="toggleMovieMoreMenu(event)" title="Daha fazla">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+      </button>
+      <div class="more-menu" id="movieMoreMenu">
+        <button class="more-menu-item" onclick="startMovieQuiz();closeMovieMoreMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Quiz
+        </button>
+        <button class="more-menu-item" onclick="openMovieWrapped();closeMovieMoreMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Yıl Özeti
+        </button>
+        <div class="more-menu-divider"></div>
+        <button class="more-menu-item" onclick="exportMovieData();closeMovieMoreMenu()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Dışa Aktar
+        </button>
+      </div>
+    </div>
   </div>
   <button class="btn-add" onclick="openMovieModal()">
     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -7739,23 +7831,19 @@
     <input type="text" id="movieDiscoverSearch" placeholder="Film veya dizi ara..." oninput="onMovieDiscoverSearch(this.value)" autocomplete="off">
     <button id="movieDiscoverSearchClear" onclick="clearMovieDiscoverSearch()" style="display:none;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;font-size:16px;">✕</button>
   </div>
-  <div class="discover-filters">
-    <button class="discover-filter active" data-mdisc="trending_movie" onclick="loadMovieDiscover('trending_movie')">🔥 Trend Filmler</button>
-    <button class="discover-filter" data-mdisc="trending_tv" onclick="loadMovieDiscover('trending_tv')">📺 Trend Diziler</button>
-    <button class="discover-filter" data-mdisc="anime" onclick="loadMovieDiscover('anime')">🎌 Anime</button>
-    <button class="discover-filter" data-mdisc="upcoming" onclick="loadMovieDiscover('upcoming')">📅 Yakında Çıkacak</button>
-    <button class="discover-filter" data-mdisc="top_rated" onclick="loadMovieDiscover('top_rated')">⭐ En Çok Puan Alan</button>
-    <button class="discover-filter" data-mdisc="hidden_gems" onclick="loadMovieDiscover('hidden_gems')">💎 Gizli Hazineler</button>
-    <button class="discover-filter" data-mdisc="for_you" onclick="loadMovieDiscover('for_you')">✨ Senin İçin</button>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;flex-wrap:wrap;">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-    <select id="movieDiscoverSortSelect" onchange="onMovieDiscoverSortChange(this.value)" style="min-width:170px;width:auto;flex:0;font-size:13px;padding:7px 12px;">
-      <option value="popularity.desc">🔥 Popülerlik (Varsayılan)</option>
-      <option value="vote_average.desc">⭐ Puan (Yüksek → Düşük)</option>
-      <option value="vote_average.asc">⭐ Puan (Düşük → Yüksek)</option>
-      <option value="primary_release_date.desc">📅 Tarih (Yeni → Eski)</option>
-      <option value="primary_release_date.asc">📅 Tarih (Eski → Yeni)</option>
+  <div class="disc-filter-bar">
+    <button class="disc-chip active" data-mdisc="trending_movie" onclick="loadMovieDiscover('trending_movie')">🔥 Trend</button>
+    <button class="disc-chip" data-mdisc="trending_tv" onclick="loadMovieDiscover('trending_tv')">📺 Diziler</button>
+    <button class="disc-chip" data-mdisc="anime" onclick="loadMovieDiscover('anime')">🎌 Anime</button>
+    <button class="disc-chip" data-mdisc="upcoming" onclick="loadMovieDiscover('upcoming')">📅 Yakında</button>
+    <button class="disc-chip" data-mdisc="top_rated" onclick="loadMovieDiscover('top_rated')">⭐ En İyi</button>
+    <button class="disc-chip" data-mdisc="hidden_gems" onclick="loadMovieDiscover('hidden_gems')">💎 Gizli</button>
+    <button class="disc-chip" data-mdisc="for_you" onclick="loadMovieDiscover('for_you')">✨ Senin İçin</button>
+    <div class="disc-sort-divider"></div>
+    <select id="movieDiscoverSortSelect" onchange="onMovieDiscoverSortChange(this.value)" class="disc-sort-select">
+      <option value="popularity.desc">🔥 Popüler</option>
+      <option value="vote_average.desc">⭐ En Yüksek</option>
+      <option value="primary_release_date.desc">📅 Yeni → Eski</option>
       <option value="title.asc">🔤 A – Z</option>
       <option value="revenue.desc">💰 Hasılat</option>
     </select>
@@ -9059,6 +9147,21 @@ document.addEventListener('click', e => {
   if (wrap && !wrap.contains(e.target)) closeMoreMenu();
 });
 
+// Film more-menu
+function toggleMovieMoreMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('movieMoreMenu');
+  if (!menu) return;
+  menu.classList.toggle('open');
+}
+function closeMovieMoreMenu() {
+  document.getElementById('movieMoreMenu')?.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('movieMoreMenuWrap');
+  if (wrap && !wrap.contains(e.target)) closeMovieMoreMenu();
+});
+
 // ---------- MODAL ----------
 function openModal(id = null) {
   editingId = id;
@@ -9499,13 +9602,22 @@ async function _renderImpl() {
   // Sadece değişti ise bump
   const prevPlayed = headerStats.dataset.played;
   const prevAvg = headerStats.dataset.avg;
-  headerStats.innerHTML =
-    `<div>Toplam <b id="hsPlayed">${newPlayedCount}</b> oyun</div>
-     <div>Ort. puan <b id="hsAvg">${newAvg}</b></div>`;
+  // ⚡ HIZ: innerHTML parse maliyetini kaldır — textContent ile sadece sayıları güncelle
+  let hsPlayed = document.getElementById('hsPlayed');
+  let hsAvg = document.getElementById('hsAvg');
+  if (!hsPlayed || !hsAvg) {
+    headerStats.innerHTML =
+      `<div>Toplam <b id="hsPlayed">${newPlayedCount}</b> oyun</div>
+       <div>Ort. puan <b id="hsAvg">${newAvg}</b></div>`;
+    hsPlayed = document.getElementById('hsPlayed');
+    hsAvg = document.getElementById('hsAvg');
+  } else {
+    hsPlayed.textContent = String(newPlayedCount);
+    hsAvg.textContent = String(newAvg);
+  }
   if (prevPlayed && prevPlayed !== String(newPlayedCount)) {
-    const el = document.getElementById('hsPlayed');
-    el.classList.add('bumped');
-    setTimeout(() => el.classList.remove('bumped'), 300);
+    hsPlayed.classList.add('bumped');
+    setTimeout(() => hsPlayed.classList.remove('bumped'), 300);
   }
   if (prevAvg && prevAvg !== String(newAvg)) {
     const el = document.getElementById('hsAvg');
@@ -11027,7 +11139,9 @@ async function updateBackupUI() {
 
 async function exportData() {
   const data = await getData();
-  const json = JSON.stringify(data, null, 2);
+  const movieData = await getMovieData();
+  const backup = { ...data, movies: movieData };
+  const json = JSON.stringify(backup, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -11123,7 +11237,7 @@ async function importData(event) {
       const parsed = JSON.parse(e.target.result);
       if (!parsed.played || !parsed.wishlist) throw new Error('Geçersiz format');
       const existing = await getData();
-      // Merge - avoid duplicates by id
+      // Merge oyunlar - avoid duplicates by id
       const existingIds = new Set([
         ...existing.played.map(g => g.id),
         ...existing.wishlist.map(g => g.id)
@@ -11134,7 +11248,25 @@ async function importData(event) {
       };
       await saveData(merged);
       await render();
-      showToast(`İçe aktarıldı: +${parsed.played.length} oyun ✓`, 'success');
+
+      // Film/dizi verisi varsa geri yükle
+      let movieMsg = '';
+      if (parsed.movies && (Array.isArray(parsed.movies.watched) || Array.isArray(parsed.movies.watchlist))) {
+        const existingMovies = await getMovieData();
+        const existingMovieIds = new Set([
+          ...existingMovies.watched.map(m => m.id),
+          ...existingMovies.watchlist.map(m => m.id)
+        ]);
+        const mergedMovies = {
+          watched:   [...existingMovies.watched,   ...(parsed.movies.watched  || []).filter(m => !existingMovieIds.has(m.id))],
+          watchlist: [...existingMovies.watchlist, ...(parsed.movies.watchlist|| []).filter(m => !existingMovieIds.has(m.id))]
+        };
+        await saveMovieData(mergedMovies);
+        if (typeof renderMovies === 'function') renderMovies();
+        movieMsg = `, +${(parsed.movies.watched||[]).length + (parsed.movies.watchlist||[]).length} film/dizi`;
+      }
+
+      showToast(`İçe aktarıldı: +${parsed.played.length} oyun${movieMsg} ✓`, 'success');
     } catch(err) {
       showToast('Geçersiz dosya!', 'error');
     }
@@ -13099,24 +13231,106 @@ function startMovieQuiz() { MovieQuiz.open('movie'); }
 function closeMovieQuiz() { MovieQuiz.close(); }
 
 async function resetAllData() {
-  if (!confirm('⚠️ TÜM VERİLERİ SİL?\n\nOynananlar, istek listesi VE film/dizi verisi tamamen silinecek.\nBu işlem geri alınamaz!')) return;
+  if (!confirm('⚠️ TÜM VERİLERİ SİL?\n\nOyunlar, film/diziler, ayarlar, cache\'ler — HER ŞEY tamamen silinecek.\nBu işlem geri alınamaz!')) return;
   if (!confirm('🔴 Emin misin? Son şans!')) return;
+
   const empty = { played: [], wishlist: [] };
   const emptyMovies = { watched: [], watchlist: [] };
+
+  // 1) Bellek cache'lerini temizle
   _dataCache = null;
-  if (hasCloudStorage) { try { await window.storage.set('games_v2', JSON.stringify(empty)); } catch {} }
-  try {
-    localStorage.removeItem('games_v2');
-    localStorage.removeItem('games');
-    localStorage.removeItem('archi_movies_v1');
-  } catch {}
-  _dataCache = empty;
   _movieDataCache = null;
-  await saveData(empty);
-  await saveMovieData(emptyMovies);
-  await render();
-  if (typeof renderMovies === 'function') renderMovies();
-  showToast('🔄 Tüm veriler sıfırlandı', 'success');
+  try { _omdbCache?.clear?.(); } catch {}
+  try { _tmdbDetailCache?.clear?.(); } catch {}
+  try { _tmdbSearchCache?.clear?.(); } catch {}
+  try { _dominantCache?.clear?.(); } catch {}
+  try { _enTitleCache?.clear?.(); } catch {}
+  try { _enTitlePending?.clear?.(); } catch {}
+  try { _rawgSearchCache?.clear?.(); } catch {}
+  try { _rawgDetailCache?.clear?.(); } catch {}
+  try { _trophyMemo?.clear?.(); } catch {}
+  try { _similarMoviesCache?.clear?.(); } catch {}
+  try { if (typeof _movieDiscoverCache !== 'undefined') _movieDiscoverCache = {}; } catch {}
+  try { if (typeof _discoverCache !== 'undefined') _discoverCache = {}; } catch {}
+  try { _animeBackfillDone = false; _animeBackfillRunning = false; } catch {}
+  // WeakMap'leri yeni instance ile değiştir
+  try { _animeMemo = new WeakMap(); } catch {}
+
+  // 2) Cloud storage temizle
+  if (hasCloudStorage) {
+    try { await window.storage.set('games_v2', JSON.stringify(empty)); } catch {}
+    try { await window.storage.delete?.('games_v2'); } catch {}
+  }
+
+  // 3) localStorage'daki TÜM 'archi' / 'rawg' / 'games' / ayar anahtarlarını tek tek sil
+  const keysToRemove = [
+    // Veri
+    'games_v2', 'games', 'archi_movies_v1',
+    // Cache'ler
+    'rawg_search_cache_v1', 'rawg_detail_cache_v1', 'omdb_api_key',
+    // Ayarlar
+    'view', 'cardSize', 'hideNSFW', 'showTagsOnCard',
+    'theme', 'accentColor', 'accentColorDark',
+    // Achievement & diğer
+    'yearGoals', 'lastInactivityCheck', 'archi_achievements_v1',
+  ];
+  try {
+    keysToRemove.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+  } catch {}
+
+  // 4) Bilinmeyen ama prefix'li anahtarları da temizle (geleceğe karşı)
+  try {
+    const all = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('archi_') || k.startsWith('archi-') || k.startsWith('rawg_'))) all.push(k);
+    }
+    all.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+  } catch {}
+
+  // 5) sessionStorage temizle
+  try { sessionStorage.clear(); } catch {}
+
+  // 6) IndexedDB — File System handle'larını sil
+  try {
+    if (typeof indexedDB !== 'undefined') {
+      // Auto-backup handle DB
+      try { indexedDB.deleteDatabase('archi-fs-handles'); } catch {}
+    }
+  } catch {}
+
+  // 7) Service Worker cache'lerini temizle
+  try {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage('CLEAR_CACHES');
+    }
+    if ('caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.filter(n => n.startsWith('archi-')).map(n => caches.delete(n)));
+    }
+  } catch {}
+
+  // 8) Auto-backup zamanlayıcılarını iptal et
+  try {
+    if (typeof _saveMovieTimer !== 'undefined' && _saveMovieTimer) {
+      clearTimeout(_saveMovieTimer); _saveMovieTimer = null;
+    }
+    if (typeof _autoBackupTimer !== 'undefined') {
+      Object.values(_autoBackupTimer).forEach(t => t && clearTimeout(t));
+    }
+  } catch {}
+
+  // 9) Boş data'yı yaz
+  _dataCache = empty;
+  _movieDataCache = emptyMovies;
+  try { localStorage.setItem('games_v2', JSON.stringify(empty)); } catch {}
+  try { localStorage.setItem('archi_movies_v1', JSON.stringify(emptyMovies)); } catch {}
+
+  // 10) UI'yı tamamen yenile
+  showToast('🔄 Tüm veriler ve ayarlar sıfırlandı — sayfa yenileniyor...', 'success');
+  setTimeout(() => {
+    try { location.reload(); } catch { location.href = location.pathname; }
+  }, 800);
 }
 
 // ==================== SAYFA GEÇİŞİ ====================
@@ -13134,7 +13348,7 @@ function switchPage(page) {
   const mov  = document.getElementById('moviesPage');
   const subTabs = document.getElementById('gamesSubTabs');
 
-  // Üst sekme görsel durumu
+  // ⚡ HIZ: Üst sekme görsel durumu — anında
   document.getElementById('pageTabGames')?.classList.toggle('active',  page === 'games');
   document.getElementById('pageTabMovies')?.classList.toggle('active', page === 'movies');
 
@@ -13145,7 +13359,6 @@ function switchPage(page) {
     if (logoSub.textContent !== newLabel) {
       logoSub.textContent = newLabel;
       logoSub.classList.remove('flash');
-      // Reflow tetikle ki animasyon tekrar çalışsın
       void logoSub.offsetWidth;
       logoSub.classList.add('flash');
     }
@@ -13154,7 +13367,8 @@ function switchPage(page) {
   // Alt sekme sadece oyunlar sayfasında görünsün
   if (subTabs) subTabs.style.display = (page === 'games') ? '' : 'none';
 
-  // Hepsini önce kapat (varsayılan)
+  // ⚡ HIZ: Görsel değişimleri ANINDA — eski opacity tween kaldırıldı, drop'u yaratan oydu
+  // Tüm sayfaları kapat
   if (disc) disc.classList.remove('active');
   if (mov) {
     mov.classList.remove('active');
@@ -13167,10 +13381,7 @@ function switchPage(page) {
     document.getElementById('gamesSubTab_discover')?.classList.toggle('active', currentGamesSubSection === 'discover');
 
     if (currentGamesSubSection === 'library') {
-      if (lib) {
-        lib.style.display = '';
-        lib.style.opacity = '1';
-      }
+      if (lib) { lib.style.display = ''; lib.style.opacity = '1'; }
       if (dashboardOpen) {
         dashboardOpen = false;
         document.getElementById('dashboard').style.display = 'none';
@@ -13180,26 +13391,25 @@ function switchPage(page) {
         document.getElementById('btnDashboard')?.classList.remove('active');
       }
     } else { // discover
-      if (lib) {
-        lib.style.opacity = '0';
-        setTimeout(() => { if (currentGamesSubSection !== 'library' || currentPage !== 'games') lib.style.display = 'none'; }, 200);
-      }
+      if (lib) { lib.style.display = 'none'; lib.style.opacity = '1'; }
       if (disc) disc.classList.add('active');
+      // Discover içeriği yoksa load et — arka planda
       if (!_discoverCache[currentDiscoverFilter]?.results?.length) {
-        loadDiscover(currentDiscoverFilter);
+        // ⚡ Yükleme network'e bağlı, idle'da bırak
+        (typeof requestIdleCallback === 'function' ? requestIdleCallback : setTimeout)(
+          () => loadDiscover(currentDiscoverFilter), { timeout: 100 }
+        );
       }
     }
   } else if (page === 'movies') {
-    if (lib) {
-      lib.style.opacity = '0';
-      setTimeout(() => { if (currentPage !== 'games') lib.style.display = 'none'; }, 200);
-    }
+    if (lib) { lib.style.display = 'none'; lib.style.opacity = '1'; }
     if (mov) mov.classList.add('active');
-    renderMovies();
+    // ⚡ HIZ: renderMovies'i bir sonraki frame'de çağır — sekme geçişi pürüzsüz
+    requestAnimationFrame(() => renderMovies());
   }
 
-  // Üste kaydır
-  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  // ⚡ HIZ: Üste kaydır — instant, jank yaratan smooth scroll kaldırıldı
+  try { window.scrollTo(0, 0); } catch {}
 }
 
 // Oyunlar alt sekme geçişi: Kütüphanem ↔ Keşfet
@@ -13636,7 +13846,7 @@ function buildDiscoverUrl(filter, page = 1) {
 async function loadDiscover(filter) {
   currentDiscoverFilter = filter;
   _discoverLoadingMore = false; // filtre değişince kilidi sıfırla
-  document.querySelectorAll('.discover-filter').forEach(b =>
+  document.querySelectorAll('.discover-filter, .disc-chip[data-discover]').forEach(b =>
     b.classList.toggle('active', b.dataset.discover === filter)
   );
 
@@ -15276,7 +15486,7 @@ async function renderMovieDiscover(filter) {
         // Bitince yeniden render (kullanıcı hâlâ aynı filtredeyse)
         if (anyUpdated &&
             _movieDiscoverCache[filter] &&
-            document.querySelector(`.discover-filter[data-mdisc="${filter}"]`)?.classList.contains('active')) {
+            document.querySelector(`.disc-chip[data-mdisc="${filter}"], .discover-filter[data-mdisc="${filter}"]`)?.classList.contains('active')) {
           renderMovieDiscover(filter);
         }
       })();
@@ -16558,7 +16768,7 @@ async function fetchEnglishTitle(tmdbId, mediaType) {
 
 // §ANIME — anime tespiti (TMDB verisinden + sezgisel + kullanıcı override)
 // ⚡ HIZ: Memoize — kart başına bir kez hesaplanır
-const _animeMemo = new WeakMap();
+let _animeMemo = new WeakMap();
 function isAnime(m) {
   if (!m) return false;
   // Object referansı aynı kaldığı sürece cache geçerli
