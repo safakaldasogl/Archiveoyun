@@ -11903,7 +11903,7 @@ const Quiz = (() => {
     return            { label: 'Hiç Olmamış',             emoji: '💩' };
   }
 
-  function _updateScoreUI(score) {
+  function _updateGameScoreUI(score) {
     const lbl  = document.getElementById('quizRatingLabel');
     const emj  = document.getElementById('quizScoreEmoji');
     const fill = document.getElementById('quizScoreFill');
@@ -11912,10 +11912,11 @@ const Quiz = (() => {
       if (fill) fill.style.width = '0%'; return;
     }
     const sl = _getScoreLabel(score);
-    if (lbl)  lbl.textContent  = `${score}`;
+    if (lbl)  lbl.textContent  = `${sl.emoji} ${sl.label}`;
     if (emj)  emj.textContent  = sl.emoji;
     if (fill) fill.style.width = `${score >= 100 ? 100 : score}%`;
   }
+  function _updateScoreUI(score) { _updateGameScoreUI(score); }
 
   async function _syncWishBtn() {
     const btn = document.getElementById('quizWishBtn');
@@ -12506,7 +12507,7 @@ const MovieQuiz = (() => {
     return            { label:'Hiç Olmamış',             emoji:'💩' };
   }
 
-  function _updateScoreUI(score) {
+  function _updateMovieScoreUI(score) {
     const lbl  = document.getElementById('mqRatingLabel');
     const emj  = document.getElementById('mqScoreEmoji');
     const fill = document.getElementById('mqScoreFill');
@@ -12515,7 +12516,7 @@ const MovieQuiz = (() => {
       if (fill) fill.style.width = '0%'; return;
     }
     const sl = _getScoreLabel(score);
-    if (lbl)  lbl.textContent = `${score}`;
+    if (lbl)  lbl.textContent = `${sl.emoji} ${sl.label}`;
     if (emj)  emj.textContent = sl.emoji;
     if (fill) fill.style.width = `${score >= 100 ? 100 : score}%`;
   }
@@ -13190,7 +13191,7 @@ const MovieQuiz = (() => {
       const inp = document.getElementById('mqScoreInput');
       if (inp) inp.value = score;
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.toggle('active', b === qpBtn));
-      _updateScoreUI(score); return;
+      _updateMovieScoreUI(score); return;
     }
     const stBtn = t.closest('.mq-status-btn');
     if (stBtn) {
@@ -13208,10 +13209,10 @@ const MovieQuiz = (() => {
     if (!isNaN(raw)) {
       const real   = Math.max(0, raw);
       const visual = Math.min(100, real);
-      _updateScoreUI(visual);
+      _updateMovieScoreUI(visual);
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.score) === real));
     } else {
-      _updateScoreUI(null);
+      _updateMovieScoreUI(null);
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.remove('active'));
     }
   });
