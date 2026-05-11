@@ -4,6 +4,8 @@
 .field final synthetic this$0:Lcom/archiveoyun/app/MainActivity;
 
 .method constructor <init>(Lcom/archiveoyun/app/MainActivity;)V
+    # p0=this, p1=outer  => 2 params
+    # .registers 2 => no locals, params: v0=p0, v1=p1
     .registers 2
     iput-object p1, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
     invoke-direct {p0}, Landroid/webkit/WebChromeClient;-><init>()V
@@ -11,35 +13,33 @@
 .end method
 
 .method public onShowFileChooser(Landroid/webkit/WebView;Landroid/webkit/ValueCallback;Landroid/webkit/WebChromeClient$FileChooserParams;)Z
-    .registers 6
-    # p1 = webView, p2 = filePathCallback, p3 = fileChooserParams
+    # p0=this, p1=webView, p2=filePathCallback, p3=fileChooserParams  => 4 params
+    # .registers 8 => locals: v0..v3, params: v4=p0, v5=p1, v6=p2, v7=p3
+    .registers 8
 
-    # Önceki callback varsa iptal et
+    # Önceki callback varsa null ile iptal et
     iget-object v0, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
     iget-object v1, v0, Lcom/archiveoyun/app/MainActivity;->filePathCallback:Landroid/webkit/ValueCallback;
     if-eqz v1, :no_prev
-
     const/4 v2, 0x0
     invoke-interface {v1, v2}, Landroid/webkit/ValueCallback;->onReceiveValue(Ljava/lang/Object;)V
 
     :no_prev
-    # Yeni callback'i sakla
+    # Yeni callback'i kaydet
     iget-object v0, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
     iput-object p2, v0, Lcom/archiveoyun/app/MainActivity;->filePathCallback:Landroid/webkit/ValueCallback;
 
-    # Intent oluştur
+    # Dosya seçici intent
     new-instance v1, Landroid/content/Intent;
     const-string v2, "android.intent.action.GET_CONTENT"
     invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
-
     const-string v2, "*/*"
     invoke-virtual {v1, v2}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
-    move-result-object v2
 
-    # startActivityForResult
-    iget-object v0, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
-    const/4 v3, 0x1
-    invoke-virtual {v0, v1, v3}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
+    # Activity.startActivityForResult(intent, 1)
+    iget-object v3, p0, Lcom/archiveoyun/app/MainActivity$1;->this$0:Lcom/archiveoyun/app/MainActivity;
+    const/4 v2, 0x1
+    invoke-virtual {v3, v1, v2}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
 
     const/4 v0, 0x1
     return v0

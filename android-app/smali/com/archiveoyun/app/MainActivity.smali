@@ -12,27 +12,26 @@
 .end method
 
 .method protected onCreate(Landroid/os/Bundle;)V
-    .registers 6
+    # p0=this, p1=savedInstanceState  => 2 params
+    # .registers 7 => locals: v0..v4, params: v5=p0, v6=p1
+    .registers 7
     .param p1, "savedInstanceState"
 
     invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
 
     new-instance v0, Landroid/webkit/WebView;
     invoke-direct {v0, p0}, Landroid/webkit/WebView;-><init>(Landroid/content/Context;)V
-
     iput-object v0, p0, Lcom/archiveoyun/app/MainActivity;->webView:Landroid/webkit/WebView;
 
     invoke-virtual {v0}, Landroid/webkit/WebView;->getSettings()Landroid/webkit/WebSettings;
     move-result-object v1
 
     const/4 v2, 0x1
-
     invoke-virtual {v1, v2}, Landroid/webkit/WebSettings;->setJavaScriptEnabled(Z)V
     invoke-virtual {v1, v2}, Landroid/webkit/WebSettings;->setDomStorageEnabled(Z)V
     invoke-virtual {v1, v2}, Landroid/webkit/WebSettings;->setAllowFileAccess(Z)V
     invoke-virtual {v1, v2}, Landroid/webkit/WebSettings;->setAllowContentAccess(Z)V
 
-    # WebChromeClient ile dosya seçici desteği
     new-instance v3, Lcom/archiveoyun/app/MainActivity$1;
     invoke-direct {v3, p0}, Lcom/archiveoyun/app/MainActivity$1;-><init>(Lcom/archiveoyun/app/MainActivity;)V
     invoke-virtual {v0, v3}, Landroid/webkit/WebView;->setWebChromeClient(Landroid/webkit/WebChromeClient;)V
@@ -47,52 +46,44 @@
 
 .method public onBackPressed()V
     .registers 3
-
     iget-object v0, p0, Lcom/archiveoyun/app/MainActivity;->webView:Landroid/webkit/WebView;
-
     invoke-virtual {v0}, Landroid/webkit/WebView;->canGoBack()Z
     move-result v1
-
     if-eqz v1, :cond_no_back
-
     invoke-virtual {v0}, Landroid/webkit/WebView;->goBack()V
     return-void
-
     :cond_no_back
     invoke-super {p0}, Landroid/app/Activity;->onBackPressed()V
     return-void
 .end method
 
 .method protected onActivityResult(IILandroid/content/Intent;)V
-    .registers 7
+    # p0=this, p1=requestCode, p2=resultCode, p3=data  => 4 params
+    # .registers 9 => locals: v0..v4, params: v5=p0, v6=p1, v7=p2, v8=p3
+    .registers 9
     .param p1, "requestCode"
     .param p2, "resultCode"
     .param p3, "data"
 
-    # requestCode == 1 kontrolü
     const/4 v0, 0x1
     if-ne p1, v0, :cond_not_ours
 
     iget-object v1, p0, Lcom/archiveoyun/app/MainActivity;->filePathCallback:Landroid/webkit/ValueCallback;
-    if-eqz v1, :cond_no_callback
+    if-eqz v1, :cond_done
 
-    # RESULT_OK == -1
+    # RESULT_OK = -1
     const/4 v2, -0x1
     if-ne p2, v2, :cond_cancelled
-
-    # data null mu?
     if-eqz p3, :cond_cancelled
 
     invoke-virtual {p3}, Landroid/content/Intent;->getData()Landroid/net/Uri;
     move-result-object v3
     if-eqz v3, :cond_cancelled
 
-    # Uri[] array oluştur
     const/4 v4, 0x1
     new-array v4, v4, [Landroid/net/Uri;
-    const/4 v5, 0x0
-    aput-object v3, v4, v5
-
+    const/4 v0, 0x0
+    aput-object v3, v4, v0
     invoke-interface {v1, v4}, Landroid/webkit/ValueCallback;->onReceiveValue(Ljava/lang/Object;)V
 
     const/4 v0, 0x0
@@ -105,7 +96,7 @@
     iput-object v0, p0, Lcom/archiveoyun/app/MainActivity;->filePathCallback:Landroid/webkit/ValueCallback;
     return-void
 
-    :cond_no_callback
+    :cond_done
     return-void
 
     :cond_not_ours
