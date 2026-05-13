@@ -9170,11 +9170,11 @@ function openModal(id = null) {
 
   if (id) {
     getData().then(data => {
-      let g = data[currentTab].find(x => String(x.id) === String(id));
+      let g = data[currentTab].find(x => x.id === id);
       let foundTab = currentTab;
       if (!g) {
         const otherTab = currentTab === 'played' ? 'wishlist' : 'played';
-        g = data[otherTab].find(x => String(x.id) === String(id));
+        g = data[otherTab].find(x => x.id === id);
         if (g) foundTab = otherTab;
       }
       if (!g) { showToast('Oyun bulunamadı', 'error'); return; }
@@ -9311,7 +9311,7 @@ async function saveGame() {
     const targetTab = editingId ? (editingTab || currentTab) : currentTab;
 
     if (editingId) {
-      const idx = data[targetTab].findIndex(x => String(x.id) === String(editingId));
+      const idx = data[targetTab].findIndex(x => x.id === editingId);
       if (idx !== -1) {
         const oldCreatedAt = data[targetTab][idx].createdAt;
         data[targetTab][idx] = { ...buildGame(imageData), createdAt: oldCreatedAt };
@@ -9367,10 +9367,10 @@ async function saveGame() {
 async function deleteGame(id) {
   const data = await getData();
   let tab = currentTab;
-  let idx = data[tab].findIndex(x => String(x.id) === String(id));
+  let idx = data[tab].findIndex(x => x.id === id);
   if (idx === -1) {
     tab = tab === 'played' ? 'wishlist' : 'played';
-    idx = data[tab].findIndex(x => String(x.id) === String(id));
+    idx = data[tab].findIndex(x => x.id === id);
   }
   if (idx === -1) return;
 
@@ -9445,10 +9445,10 @@ function hideUndoToast() {
 async function moveGame(id) {
   const data = await getData();
   let from = currentTab;
-  let idx  = data[from].findIndex(x => String(x.id) === String(id));
+  let idx  = data[from].findIndex(x => x.id === id);
   if (idx === -1) {
     from = from === 'played' ? 'wishlist' : 'played';
-    idx  = data[from].findIndex(x => String(x.id) === String(id));
+    idx  = data[from].findIndex(x => x.id === id);
   }
   if (idx === -1) return;
   const to = from === 'played' ? 'wishlist' : 'played';
@@ -9874,8 +9874,8 @@ function initWishlistDrag() {
 
       const data = await getData();
       const list = data.wishlist || [];
-      const srcIdx = list.findIndex(g => String(g.id) === String(srcId));
-      const dstIdx = list.findIndex(g => String(g.id) === String(dstId));
+      const srcIdx = list.findIndex(g => g.id === srcId);
+      const dstIdx = list.findIndex(g => g.id === dstId);
       if (srcIdx < 0 || dstIdx < 0) return;
 
       // Sırala
@@ -11402,10 +11402,10 @@ let _detailRawgCache = {};
 async function openDetail(gameId) {
   const data = await getData();
   // Hem played hem wishlist'te ara
-  let game = data.played.find(g => String(g.id) === String(gameId));
+  let game = data.played.find(g => g.id === gameId);
   let tab = 'played';
   if (!game) {
-    game = data.wishlist.find(g => String(g.id) === String(gameId));
+    game = data.wishlist.find(g => g.id === gameId);
     tab = 'wishlist';
   }
   if (!game) return;
@@ -11713,7 +11713,7 @@ async function addSession(e, gameId) {
 
   const data = await getData();
   // Sadece played sekmesinde işliyoruz
-  const idx = data.played.findIndex(g => String(g.id) === String(gameId));
+  const idx = data.played.findIndex(g => g.id === gameId);
   if (idx === -1) return;
 
   if (!Array.isArray(data.played[idx].sessions)) data.played[idx].sessions = [];
@@ -11741,7 +11741,7 @@ async function addSession(e, gameId) {
 
 async function deleteSession(gameId, sessionId) {
   const data = await getData();
-  const idx = data.played.findIndex(g => String(g.id) === String(gameId));
+  const idx = data.played.findIndex(g => g.id === gameId);
   if (idx === -1) return;
   if (!Array.isArray(data.played[idx].sessions)) return;
   data.played[idx].sessions = data.played[idx].sessions.filter(s => s.id !== sessionId);
@@ -11903,7 +11903,7 @@ const Quiz = (() => {
     return            { label: 'Hiç Olmamış',             emoji: '💩' };
   }
 
-  function _updateGameScoreUI(score) {
+  function _updateScoreUI(score) {
     const lbl  = document.getElementById('quizRatingLabel');
     const emj  = document.getElementById('quizScoreEmoji');
     const fill = document.getElementById('quizScoreFill');
@@ -11912,11 +11912,10 @@ const Quiz = (() => {
       if (fill) fill.style.width = '0%'; return;
     }
     const sl = _getScoreLabel(score);
-    if (lbl)  lbl.textContent  = `${sl.emoji} ${sl.label}`;
+    if (lbl)  lbl.textContent  = `${score}`;
     if (emj)  emj.textContent  = sl.emoji;
     if (fill) fill.style.width = `${score >= 100 ? 100 : score}%`;
   }
-  function _updateScoreUI(score) { _updateGameScoreUI(score); }
 
   async function _syncWishBtn() {
     const btn = document.getElementById('quizWishBtn');
@@ -12358,6 +12357,8 @@ const MovieQuiz = (() => {
   let _mode    = 'movie'; // 'movie' | 'tv' | 'anime'
   let _animeMediaType = 'tv'; // anime modunda: 'tv' (seri) veya 'movie' — varsayılan TV
   let _minVote = 0;       // 0 = filtresiz, 5 = 5+, 6 = 6+, 7 = 7+, 8 = 8+
+  let _yearFrom = 0;     // 0 = filtresiz
+  let _yearTo   = 0;     // 0 = filtresiz
   const _recStore = new Map();
 
   // TMDB tür ID'leri (filme göre — TV ID'leri farklı, ama çoğu örtüşür)
@@ -12507,7 +12508,7 @@ const MovieQuiz = (() => {
     return            { label:'Hiç Olmamış',             emoji:'💩' };
   }
 
-  function _updateMovieScoreUI(score) {
+  function _updateScoreUI(score) {
     const lbl  = document.getElementById('mqRatingLabel');
     const emj  = document.getElementById('mqScoreEmoji');
     const fill = document.getElementById('mqScoreFill');
@@ -12516,7 +12517,7 @@ const MovieQuiz = (() => {
       if (fill) fill.style.width = '0%'; return;
     }
     const sl = _getScoreLabel(score);
-    if (lbl)  lbl.textContent = `${sl.emoji} ${sl.label}`;
+    if (lbl)  lbl.textContent = `${score}`;
     if (emj)  emj.textContent = sl.emoji;
     if (fill) fill.style.width = `${score >= 100 ? 100 : score}%`;
   }
@@ -12597,6 +12598,28 @@ const MovieQuiz = (() => {
           </div>
         </div>
 
+        <!-- Yıl filtresi -->
+        <div style="margin-bottom:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            📅 Yıl Aralığı
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${[{f:0,t:0,l:'Hepsi'},{f:2020,t:0,l:'2020+'},{f:2015,t:2019,l:'2015–19'},{f:2010,t:2014,l:'2010–14'},{f:2000,t:2009,l:'2000–09'},{f:1990,t:1999,l:'90\'lar'},{f:0,t:1989,l:'Klasik'}].map(o => {
+              const active = _yearFrom===o.f && _yearTo===o.t;
+              return `<button class="mq-year-btn" data-yf="${o.f}" data-yt="${o.t}"
+                style="flex:1;min-width:52px;padding:7px 4px;border-radius:8px;border:1px solid ${active?'rgba(91,143,255,0.6)':'var(--border)'};
+                       background:${active?'rgba(91,143,255,0.15)':'transparent'};
+                       color:${active?'var(--accent)':'var(--text)'};
+                       font-family:var(--font-body);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s ease;">
+                ${o.l}
+              </button>`;
+            }).join('')}
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.4;">
+            ${_yearFrom===0 && _yearTo===0 ? 'Tüm yıllardan rastgele' : _yearTo===0 ? `${_yearFrom} ve sonrası` : _yearFrom===0 ? `${_yearTo} ve öncesi` : `${_yearFrom}–${_yearTo} yılları arası`}
+          </div>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
           ${genres.map(g => `
             <button class="mq-genre-btn" data-id="${g.id}" data-label="${g.label}"
@@ -12663,12 +12686,28 @@ const MovieQuiz = (() => {
 
       // Birkaç sayfa toplayalım ki yeterli aday gelsin (özellikle filtre varsa)
       // Anime aramasında daha çok sayfa, çünkü filtre dar
-      const pagesToFetch = _mode === 'anime' ? 4 : (_minVote > 0 ? 3 : 1);
-      const startPage = Math.ceil(Math.random() * 5);
+      const pagesToFetch = _mode === 'anime' ? 5 : (_minVote > 0 || _yearFrom > 0 || _yearTo > 0 ? 5 : 3);
+      // Geniş aralıkta rastgele başlangıç sayfası — dar türlerde düşük tut
+      const maxStartPage = (_mode === 'anime' || _minVote >= 7) ? 3 : 8;
+      const startPage = Math.ceil(Math.random() * maxStartPage);
       let allResults = [];
+
+      // Yıl filtresi parametreleri
+      const yearParam = (() => {
+        const dateField = path === 'tv' ? 'first_air_date' : 'release_date';
+        let p = '';
+        if (_yearFrom > 0) p += `&${dateField}.gte=${_yearFrom}-01-01`;
+        if (_yearTo   > 0) p += `&${dateField}.lte=${_yearTo}-12-31`;
+        return p;
+      })();
 
       for (let p = 0; p < pagesToFetch; p++) {
         const page = startPage + p;
+        // Her sayfada farklı sort_by — daha çeşitli sonuçlar
+        const sorts = path === 'tv'
+          ? ['vote_average.desc','popularity.desc','vote_count.desc','first_air_date.desc']
+          : ['vote_average.desc','popularity.desc','vote_count.desc','primary_release_date.desc'];
+        const sort  = sorts[(startPage + p) % sorts.length];
         let url;
         if (searchQuery) {
           // Arama: anime modunda da TMDB search; sonradan JP filtresi uygulanır
@@ -12677,8 +12716,6 @@ const MovieQuiz = (() => {
         } else if (_mode === 'anime') {
           // Anime: Animasyon türü + anime keyword + JP dili
           // genreId burada alt-tür filtresi (anime kategorisi)
-          const sorts = ['vote_average.desc','popularity.desc','vote_count.desc'];
-          const sort  = sorts[Math.floor(Math.random()*sorts.length)];
           // Genre 16 (Animasyon) zorunlu + keyword 210024 (anime) + JP
           // genreId varsa "AND" ile ek filtre uygula (16,X formatı)
           let genreParam = '16';
@@ -12690,13 +12727,11 @@ const MovieQuiz = (() => {
             // Birden fazla tür ID'si olabilir (10765,878 gibi)
             genreParam = `16,${genreId.split(',')[0]}`;
           }
-          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&with_genres=${genreParam}&with_keywords=210024${extraKeyword}&with_original_language=ja&sort_by=${sort}&vote_count.gte=${minVoteCount}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}&page=${page}`;
+          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&with_genres=${genreParam}&with_keywords=210024${extraKeyword}&with_original_language=ja&sort_by=${sort}&vote_count.gte=${minVoteCount}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}${yearParam}&page=${page}`;
         } else if (genreId) {
-          const sorts = ['vote_average.desc','popularity.desc','vote_count.desc'];
-          const sort  = sorts[Math.floor(Math.random()*sorts.length)];
-          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&with_genres=${genreId}&sort_by=${sort}&vote_count.gte=${minVoteCount}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}&page=${page}`;
+          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&with_genres=${genreId}&sort_by=${sort}&vote_count.gte=${minVoteCount}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}${yearParam}&page=${page}`;
         } else {
-          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&sort_by=popularity.desc&vote_count.gte=${Math.max(minVoteCount, 300)}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}&page=${page}`;
+          url = `${TMDB_BASE}/discover/${path}?api_key=${TMDB_KEY}&language=tr-TR&sort_by=${sort}&vote_count.gte=${Math.max(minVoteCount, 300)}${tmdbVoteGte ? `&vote_average.gte=${tmdbVoteGte}` : ''}${yearParam}&page=${page}`;
         }
         const r = await fetch(url);
         if (r.ok) {
@@ -12781,7 +12816,7 @@ const MovieQuiz = (() => {
         _render(`<div class="quiz-body" style="padding:60px 24px;text-align:center;">
           <div style="font-size:44px;margin-bottom:16px;">😕</div>
           <div style="font-family:var(--font-display);font-size:16px;color:var(--text);margin-bottom:8px;font-weight:700;">Sonuç bulunamadı</div>
-          <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">${_minVote>0?'Min puanı düşürmeyi veya farklı tür denemeyi':'Farklı bir tür veya arama'} dene</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">${_minVote>0 && (_yearFrom>0||_yearTo>0) ? 'Min puanı düşürmeyi veya yıl aralığını genişletmeyi' : _minVote>0 ? 'Min puanı düşürmeyi veya farklı tür denemeyi' : (_yearFrom>0||_yearTo>0) ? 'Yıl aralığını genişletmeyi veya farklı tür' : 'Farklı bir tür veya arama'} dene</div>
           <button class="quiz-save-btn" id="mqBackBtn">← Geri Dön</button>
         </div>`);
         return;
@@ -13127,7 +13162,7 @@ const MovieQuiz = (() => {
   }
 
   function open(initialMode = 'movie') {
-    _queue=[]; _all=[]; _current=null; _status=''; _rated=[]; _mode = initialMode;
+    _queue=[]; _all=[]; _current=null; _status=''; _rated=[]; _mode = initialMode; _yearFrom=0; _yearTo=0;
     document.getElementById('quizOverlay')?.classList.add('open');
     document.body.style.overflow = 'hidden';
     showLanding();
@@ -13155,6 +13190,15 @@ const MovieQuiz = (() => {
     const voteBtn = t.closest('.mq-vote-btn');
     if (voteBtn) {
       _minVote = parseFloat(voteBtn.dataset.vote);
+      showLanding();
+      return;
+    }
+
+    // Yıl filtresi
+    const yearBtn = t.closest('.mq-year-btn');
+    if (yearBtn) {
+      _yearFrom = parseInt(yearBtn.dataset.yf) || 0;
+      _yearTo   = parseInt(yearBtn.dataset.yt) || 0;
       showLanding();
       return;
     }
@@ -13191,7 +13235,7 @@ const MovieQuiz = (() => {
       const inp = document.getElementById('mqScoreInput');
       if (inp) inp.value = score;
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.toggle('active', b === qpBtn));
-      _updateMovieScoreUI(score); return;
+      _updateScoreUI(score); return;
     }
     const stBtn = t.closest('.mq-status-btn');
     if (stBtn) {
@@ -13209,10 +13253,10 @@ const MovieQuiz = (() => {
     if (!isNaN(raw)) {
       const real   = Math.max(0, raw);
       const visual = Math.min(100, real);
-      _updateMovieScoreUI(visual);
+      _updateScoreUI(visual);
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.score) === real));
     } else {
-      _updateMovieScoreUI(null);
+      _updateScoreUI(null);
       document.querySelectorAll('.mq-qp-btn').forEach(b => b.classList.remove('active'));
     }
   });
@@ -14888,7 +14932,7 @@ function filterCompareList(slot, query) {
 }
 
 function selectCompareGame(slot, id) {
-  const game = _compareAllGames.find(g => String(g.id) === String(id));
+  const game = _compareAllGames.find(g => g.id === id);
   if (!game) return;
   _compareSelected[slot - 1] = game;
   document.getElementById('cmpList' + slot).style.display = 'none';
@@ -16486,9 +16530,9 @@ async function openMovieModal(id) {
   if (id) {
     document.getElementById('movieModalTitle').textContent = 'Film / Dizi Düzenle';
     const data = await getMovieData();
-    let m = data.watched.find(x => String(x.id) === String(id));
+    let m = data.watched.find(x => x.id === id);
     if (m) { editingMovieTab = 'watched'; }
-    else { m = data.watchlist.find(x => String(x.id) === String(id)); if (m) editingMovieTab = 'watchlist'; }
+    else { m = data.watchlist.find(x => x.id === id); if (m) editingMovieTab = 'watchlist'; }
     if (!m) return;
 
     document.getElementById('fMovieTitle').value    = m.title     || '';
@@ -16629,10 +16673,10 @@ async function saveMovie() {
 
     if (editingMovieId) {
       // Önceki konumdan çıkar
-      const fromTab = editingMovieTab && data[editingMovieTab]?.some(x => String(x.id) === String(editingMovieId))
+      const fromTab = editingMovieTab && data[editingMovieTab]?.some(x => x.id === editingMovieId)
         ? editingMovieTab
-        : (data.watched?.some(x => String(x.id) === String(editingMovieId)) ? 'watched' : 'watchlist');
-      const fromIdx = data[fromTab]?.findIndex(x => String(x.id) === String(editingMovieId));
+        : (data.watched?.some(x => x.id === editingMovieId) ? 'watched' : 'watchlist');
+      const fromIdx = data[fromTab]?.findIndex(x => x.id === editingMovieId);
       let oldCreatedAt = Date.now();
       if (fromIdx !== -1 && fromIdx !== undefined) {
         oldCreatedAt = data[fromTab][fromIdx].createdAt || oldCreatedAt;
@@ -17095,9 +17139,9 @@ document.addEventListener('click', (e) => {
 async function incrementEpisode(id, btn) {
   const data = await getMovieData();
   // Her iki listede de ara (izledim ve izleyeceğim)
-  let m = data.watched.find(x => String(x.id) === String(id));
+  let m = data.watched.find(x => x.id === id);
   let inWatched = !!m;
-  if (!m) m = data.watchlist.find(x => String(x.id) === String(id));
+  if (!m) m = data.watchlist.find(x => x.id === id);
   if (!m) return;
   const totalEps  = m.totalEpisodes  || 0;
   const totalSeas = m.totalSeasons   || 1;
@@ -17121,7 +17165,7 @@ async function incrementEpisode(id, btn) {
   m.currentEpisode = curEp;
   // İzleyeceklerimden bir bölüm artırıldıysa, otomatik "izliyorum"a taşı
   if (!inWatched) {
-    const idx = data.watchlist.findIndex(x => String(x.id) === String(id));
+    const idx = data.watchlist.findIndex(x => x.id === id);
     if (idx !== -1) {
       const [moved] = data.watchlist.splice(idx, 1);
       moved.status = 'watching';
@@ -17159,7 +17203,7 @@ async function incrementEpisode(id, btn) {
 // ═══════════════════════════════════════════════════════════
 async function openMovieDetail(id) {
   const data = await getMovieData();
-  const m    = [...data.watched, ...data.watchlist].find(x => String(x.id) === String(id));
+  const m    = [...data.watched, ...data.watchlist].find(x => x.id === id);
   if (!m) return;
 
   const isTV  = m.mediaType === 'series';
@@ -17400,7 +17444,7 @@ document.addEventListener('click', async (e) => {
 const _similarMoviesCache = new Map(); // tmdbId:mediaType → [items]
 async function openSimilarMovies(id) {
   const data = await getMovieData();
-  const m    = [...data.watched, ...data.watchlist].find(x => String(x.id) === String(id));
+  const m    = [...data.watched, ...data.watchlist].find(x => x.id === id);
   if (!m || !m.tmdbId) {
     showToast('Önce TMDB ile eşle (düzenle → öneriler).', 'error');
     return;
@@ -17767,10 +17811,10 @@ let _movieUndoState = null;
 async function deleteMovie(id) {
   const data = await getMovieData();
   let tab = currentMovieTab;
-  let idx = data[tab].findIndex(x => String(x.id) === String(id));
+  let idx = data[tab].findIndex(x => x.id === id);
   if (idx === -1) {
     tab = tab === 'watched' ? 'watchlist' : 'watched';
-    idx = data[tab].findIndex(x => String(x.id) === String(id));
+    idx = data[tab].findIndex(x => x.id === id);
   }
   if (idx === -1) return;
 
@@ -17803,10 +17847,10 @@ async function deleteMovie(id) {
 async function moveMovie(id) {
   const data = await getMovieData();
   let from = currentMovieTab;
-  let idx  = data[from].findIndex(x => String(x.id) === String(id));
+  let idx  = data[from].findIndex(x => x.id === id);
   if (idx === -1) {
     from = from === 'watched' ? 'watchlist' : 'watched';
-    idx  = data[from].findIndex(x => String(x.id) === String(id));
+    idx  = data[from].findIndex(x => x.id === id);
   }
   if (idx === -1) return;
   const to = from === 'watched' ? 'watchlist' : 'watched';
