@@ -7257,192 +7257,236 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 <style id="archi-premium">
 /* ═══════════════════════════════════════════════════════════
-   ARCHI PREMIUM LAYER — Visual & Interaction Upgrade
+   ARCHI PREMIUM LAYER v2 — Touch-first + Visual Upgrade
    ═══════════════════════════════════════════════════════════ */
 
-/* §P1 — Extended Design Tokens */
 :root {
   --elev-1: 0 1px 3px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.18);
   --elev-2: 0 4px 14px rgba(0,0,0,0.38), 0 2px 5px rgba(0,0,0,0.22);
   --elev-3: 0 14px 44px rgba(0,0,0,0.50), 0 4px 12px rgba(0,0,0,0.28);
   --elev-4: 0 28px 72px rgba(0,0,0,0.62), 0 8px 22px rgba(0,0,0,0.34);
-  --ease-spring:         cubic-bezier(0.22, 1.00, 0.36, 1.00);
-  --ease-spring-snappy:  cubic-bezier(0.34, 1.56, 0.64, 1.00);
-  --ease-out-expo:       cubic-bezier(0.16, 1.00, 0.30, 1.00);
-  --ease-out-quart:      cubic-bezier(0.25, 1.00, 0.50, 1.00);
+  --ease-spring:        cubic-bezier(0.22, 1.00, 0.36, 1.00);
+  --ease-spring-snappy: cubic-bezier(0.34, 1.56, 0.64, 1.00);
+  --ease-out-expo:      cubic-bezier(0.16, 1.00, 0.30, 1.00);
+  --ease-out-quart:     cubic-bezier(0.25, 1.00, 0.50, 1.00);
 }
 
-/* §P2 — Grain texture */
+/* §P1 — Grain texture — premium surface */
 body::after {
   content: '';
   position: fixed; inset: 0;
   pointer-events: none; z-index: 9999;
-  opacity: 0.018;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-size: 320px 320px;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.70' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
   mix-blend-mode: overlay;
 }
 
-/* §P3 — Richer ambient background */
+/* §P2 — Richer ambient */
 body::before {
   background:
-    radial-gradient(ellipse 75vw 55vh at 12% 6%,  rgba(91,143,255,0.075) 0%, transparent 62%),
-    radial-gradient(ellipse 55vw 40vh at 88% 88%, rgba(67,233,123,0.05)  0%, transparent 58%),
-    radial-gradient(ellipse 50vw 35vh at 55% 48%, rgba(199,125,255,0.032) 0%, transparent 68%);
+    radial-gradient(ellipse 75vw 55vh at 12% 6%,  rgba(91,143,255,0.08) 0%, transparent 62%),
+    radial-gradient(ellipse 55vw 40vh at 88% 88%, rgba(67,233,123,0.055) 0%, transparent 58%),
+    radial-gradient(ellipse 50vw 35vh at 50% 45%, rgba(199,125,255,0.035) 0%, transparent 68%);
 }
 
-/* §P4 — Card spring physics */
+/* §P3 — Card entry animation */
 .card {
+  animation: premiumCardEnter 0.50s var(--ease-out-expo) both !important;
   transition:
-    transform  0.48s var(--ease-spring),
-    box-shadow 0.48s var(--ease-spring),
-    border-color 0.22s ease,
-    background   0.22s ease;
-  animation: premiumCardEnter 0.52s var(--ease-out-expo) both;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  isolation: isolate;
+    transform  0.20s var(--ease-spring-snappy),
+    box-shadow 0.20s ease,
+    border-color 0.18s ease !important;
+  -webkit-tap-highlight-color: transparent;
 }
+
 @keyframes premiumCardEnter {
-  from { opacity: 0; transform: translateY(22px) scale(0.955); }
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-.card:hover {
-  transform: translateY(-7px) scale(1.014);
-  box-shadow:
-    0 22px 64px -10px rgba(0,0,0,0.68),
-    0 8px  24px  -8px rgba(91,143,255,0.28),
-    0 1px  0         rgba(255,255,255,0.06) inset;
-}
+
+/* §P4 — Touch press state (works on Android) */
 .card:active {
-  transform: translateY(-2px) scale(1.005) !important;
-  transition-duration: 0.09s !important;
+  transform: scale(0.97) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+  transition-duration: 0.08s !important;
+  border-color: rgba(91,143,255,0.5) !important;
 }
 
-/* §P5 — Spotlight glow div (JS injected) */
-.card-spotlight {
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  pointer-events: none; z-index: 20;
-  opacity: 0; transition: opacity 0.35s ease;
-  background: radial-gradient(
-    240px circle at var(--sx, 50%) var(--sy, 50%),
-    rgba(255,255,255,0.042), transparent 78%
-  );
+/* §P5 — Tier active states */
+.card.tier-perfect:active {
+  border-color: rgba(255,209,102,0.8) !important;
+  box-shadow: 0 0 0 1px rgba(255,209,102,0.5), 0 6px 20px rgba(255,170,0,0.4) !important;
 }
-.card:hover .card-spotlight { opacity: 1; }
-
-/* §P6 — Tier hover — stronger glows */
-.card.tier-perfect:hover {
-  transform: translateY(-8px) scale(1.016);
-  box-shadow: 0 0 0 1px rgba(255,209,102,0.72), 0 24px 68px -8px rgba(255,170,0,0.52), 0 10px 26px -6px rgba(255,209,102,0.58);
+.card.tier-elite:active {
+  border-color: rgba(255,107,107,0.7) !important;
+  box-shadow: 0 6px 20px rgba(255,107,107,0.4) !important;
 }
-.card.tier-elite:hover {
-  transform: translateY(-8px) scale(1.014);
-  box-shadow: 0 24px 68px -8px rgba(0,0,0,0.68), 0 10px 26px -6px rgba(255,107,107,0.58);
-}
-.card.tier-great:hover {
-  transform: translateY(-8px) scale(1.014);
-  box-shadow: 0 24px 68px -8px rgba(0,0,0,0.68), 0 10px 26px -6px rgba(67,233,123,0.52);
-}
-.card.tier-good:hover {
-  transform: translateY(-8px) scale(1.014);
-  box-shadow: 0 24px 68px -8px rgba(0,0,0,0.68), 0 10px 26px -6px rgba(91,143,255,0.48);
+.card.tier-great:active {
+  border-color: rgba(67,233,123,0.7) !important;
+  box-shadow: 0 6px 20px rgba(67,233,123,0.35) !important;
 }
 
-/* §P7 — Image zoom */
-.card-img { transition: transform 0.58s var(--ease-out-expo) !important; }
-.card:hover .card-img { transform: scale(1.08) !important; }
-
-/* §P8 — Typography refinements */
-.card-title { letter-spacing: -0.2px; line-height: 1.22; }
-.card-rating { font-size: 23px !important; letter-spacing: -0.6px; font-weight: 800 !important; }
-
-/* §P9 — Card actions */
-.card-actions {
-  background: rgba(0,0,0,0.18) !important;
-  border-top-color: rgba(255,255,255,0.04) !important;
-  padding: 8px 12px !important; gap: 5px !important;
+/* §P6 — Desktop hover (bonus for non-touch) */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-6px) scale(1.013) !important;
+    box-shadow:
+      0 20px 60px -10px rgba(0,0,0,0.65),
+      0 8px  22px  -8px rgba(91,143,255,0.28),
+      0 1px  0         rgba(255,255,255,0.05) inset !important;
+    border-color: rgba(91,143,255,0.4) !important;
+  }
+  .card.tier-perfect:hover {
+    transform: translateY(-7px) scale(1.015) !important;
+    box-shadow: 0 0 0 1px rgba(255,209,102,0.72), 0 22px 64px -8px rgba(255,170,0,0.5), 0 10px 24px -6px rgba(255,209,102,0.55) !important;
+  }
+  .card.tier-elite:hover {
+    transform: translateY(-7px) scale(1.013) !important;
+    box-shadow: 0 22px 64px -8px rgba(0,0,0,0.65), 0 10px 24px -6px rgba(255,107,107,0.55) !important;
+  }
+  .card.tier-great:hover {
+    transform: translateY(-7px) scale(1.013) !important;
+    box-shadow: 0 22px 64px -8px rgba(0,0,0,0.65), 0 10px 24px -6px rgba(67,233,123,0.50) !important;
+  }
+  .card:hover .card-img { transform: scale(1.07) !important; }
+  .card:hover .trophy-badge { transform: translateY(-1px) scale(1.05); }
 }
 
-/* §P10 — Tactile buttons */
+/* §P7 — Image zoom base */
+.card-img {
+  transition: transform 0.55s var(--ease-out-expo) !important;
+}
+
+/* §P8 — Tactile buttons — :active works on touch */
 .btn-icon {
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease,
-              transform 0.12s var(--ease-spring-snappy), box-shadow 0.15s ease !important;
+  transition: transform 0.10s ease, background 0.15s ease,
+              color 0.15s ease, border-color 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent;
 }
-.btn-icon:active { transform: scale(0.91) translateY(1px) !important; }
-.btn-save { transition: transform 0.15s var(--ease-spring-snappy), box-shadow 0.22s ease !important; }
-.btn-save:active { transform: translateY(2px) scale(0.98) !important; }
-.btn-cancel:active, .bulk-btn:active { transform: scale(0.95) !important; }
-.tool-btn { transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s var(--ease-spring-snappy) !important; }
-.tool-btn:active { transform: scale(0.93) translateY(1px) !important; }
-.tab-btn { transition: background 0.24s var(--ease-out-quart), color 0.2s ease, box-shadow 0.24s var(--ease-out-quart) !important; }
-.btn-add:active { transform: scale(0.93) !important; }
-
-/* §P11 — Focus ring */
-*:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(91,143,255,0.72) !important;
+.btn-icon:active {
+  transform: scale(0.88) !important;
+  transition-duration: 0.06s !important;
 }
+.btn-save {
+  transition: transform 0.10s ease, box-shadow 0.2s ease !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-save:active {
+  transform: scale(0.96) translateY(1px) !important;
+  transition-duration: 0.06s !important;
+}
+.btn-cancel:active, .bulk-btn:active {
+  transform: scale(0.94) !important;
+  transition: transform 0.06s ease !important;
+}
+.tool-btn {
+  transition: transform 0.10s ease, background 0.15s ease,
+              color 0.15s ease, border-color 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.tool-btn:active {
+  transform: scale(0.92) !important;
+  transition-duration: 0.06s !important;
+}
+.tab-btn {
+  transition: background 0.22s var(--ease-out-quart),
+              color 0.18s ease, box-shadow 0.22s ease !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-btn:active { opacity: 0.8; }
 
-/* §P12 — Header glass */
+/* §P9 — Add button spring */
+.btn-add {
+  transition: transform 0.12s var(--ease-spring-snappy), box-shadow 0.2s ease !important;
+}
+.btn-add:active { transform: scale(0.90) !important; transition-duration: 0.06s !important; }
+
+/* §P10 — Header refined glass */
 header {
-  backdrop-filter: blur(22px) saturate(190%) brightness(0.92) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(0.92) !important;
-  background: rgba(9,11,17,0.72) !important;
-  transition: box-shadow 0.3s ease;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  background: rgba(9,11,17,0.78) !important;
+  transition: box-shadow 0.28s ease;
 }
 header.p-scrolled {
-  box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 8px 36px rgba(0,0,0,0.52) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 6px 28px rgba(0,0,0,0.5) !important;
 }
 
-/* §P13 — Cinematic modal */
-.modal { animation: premiumModalEnter 0.38s var(--ease-spring) !important; box-shadow: var(--elev-4), 0 1px 0 rgba(255,255,255,0.055) inset !important; }
+/* §P11 — Modal cinematic entrance */
+.modal {
+  animation: premiumModalEnter 0.36s var(--ease-spring) !important;
+  box-shadow: var(--elev-4), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+}
 @keyframes premiumModalEnter {
-  from { opacity: 0; transform: translateY(36px) scale(0.92); filter: blur(4px); }
+  from { opacity: 0; transform: translateY(32px) scale(0.93); filter: blur(3px); }
   to   { opacity: 1; transform: none; filter: none; }
 }
-.detail-box, .quiz-box, .spin-box, .similar-box { animation: premiumModalEnter 0.38s var(--ease-spring) !important; }
+.detail-box, .quiz-box, .spin-box, .similar-box {
+  animation: premiumModalEnter 0.36s var(--ease-spring) !important;
+}
+.modal-overlay { animation: premiumFadeIn 0.18s ease !important; }
+@keyframes premiumFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* §P14 — Spring toast */
-.toast { animation: premiumToastEnter 0.42s var(--ease-spring-snappy) !important; box-shadow: 0 14px 44px rgba(0,0,0,0.65), 0 2px 10px rgba(0,0,0,0.38) !important; }
-@keyframes premiumToastEnter {
-  from { opacity: 0; transform: translateY(36px) scale(0.86); }
+/* §P12 — Toast spring */
+.toast {
+  animation: premiumToastIn 0.40s var(--ease-spring-snappy) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.65), 0 2px 8px rgba(0,0,0,0.35) !important;
+}
+@keyframes premiumToastIn {
+  from { opacity: 0; transform: translateY(32px) scale(0.88); }
   to   { opacity: 1; transform: none; }
 }
 
-/* §P15 — Input focus */
+/* §P13 — Input focus */
 .field input:focus, .field select:focus, .field textarea:focus {
-  border-color: rgba(91,143,255,0.68) !important;
+  border-color: rgba(91,143,255,0.65) !important;
   background: rgba(27,32,46,1) !important;
-  box-shadow: 0 0 0 3px rgba(91,143,255,0.18), 0 2px 6px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 0 0 3px rgba(91,143,255,0.16), 0 2px 6px rgba(0,0,0,0.25) !important;
 }
 
-/* §P16 — Minimal scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* §P14 — Minimal scrollbar */
+::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(91,143,255,0.18); border-radius: 10px; border: none; }
-::-webkit-scrollbar-thumb:hover { background: rgba(91,143,255,0.42); }
+::-webkit-scrollbar-thumb { background: rgba(91,143,255,0.22); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(91,143,255,0.45); }
 
-/* §P17 — Badge refinement */
-.badge { border-radius: 5px !important; font-size: 9.5px !important; padding: 2px 6px !important; letter-spacing: 0.15px !important; }
+/* §P15 — Badge refinement */
+.badge { border-radius: 5px !important; font-size: 9.5px !important; padding: 2px 6px !important; }
 
-/* §P18 — Empty state float */
-.empty-icon { animation: premiumFloat 3.2s ease-in-out infinite !important; }
+/* §P16 — Empty state */
+.empty-icon { animation: premiumFloat 3s ease-in-out infinite !important; }
 @keyframes premiumFloat {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-10px) rotate(3deg); }
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
 }
 
-/* §P19 — Trophy badge lift */
-.trophy-badge { transition: transform 0.18s var(--ease-spring-snappy), box-shadow 0.18s ease; cursor: default; }
-.card:hover .trophy-badge { transform: translateY(-1px) scale(1.05); }
+/* §P17 — Trophy badge */
+.trophy-badge {
+  transition: transform 0.15s var(--ease-spring-snappy);
+  cursor: default;
+}
 
-/* §P20 — Reduced motion */
+/* §P18 — Card title/rating */
+.card-title { letter-spacing: -0.15px; line-height: 1.22; }
+.card-rating { font-size: 22px !important; letter-spacing: -0.5px; font-weight: 800 !important; }
+.card-actions {
+  background: rgba(0,0,0,0.2) !important;
+  border-top-color: rgba(255,255,255,0.04) !important;
+}
+
+/* §P19 — Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .card { animation: fadeIn 0.15s ease both !important; transition-duration: 0.1s !important; }
-  .card-spotlight, body::after { display: none; }
-  .modal, .detail-box, .quiz-box, .spin-box { animation: fadeIn 0.15s ease !important; filter: none !important; }
+  .card, .modal, .toast, .detail-box, .quiz-box {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  body::after { display: none; }
+}
+
+/* §P20 — Touch tap ripple feel via .p-tapped class */
+.card.p-tapped {
+  border-color: rgba(91,143,255,0.6) !important;
 }
 </style>
 </head>
@@ -18246,7 +18290,7 @@ document.addEventListener('keydown', e => {
 </div>
 
 <script id="archi-premium-js">
-/* ═══ ARCHI PREMIUM — Interaction Layer ═══ */
+/* ═══ ARCHI PREMIUM JS v2 — Touch-optimized ═══ */
 (function() {
   'use strict';
 
@@ -18255,82 +18299,74 @@ document.addEventListener('keydown', e => {
   if (header) {
     let tick = false;
     window.addEventListener('scroll', () => {
-      if (tick) return;
-      tick = true;
+      if (tick) return; tick = true;
       requestAnimationFrame(() => {
-        header.classList.toggle('p-scrolled', window.scrollY > 10);
+        header.classList.toggle('p-scrolled', window.scrollY > 8);
         tick = false;
       });
     }, { passive: true });
   }
 
-  // §J2 — Mouse-tracked spotlight on cards
-  let glowRaf;
-  document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('.card');
-    if (!card) return;
-    cancelAnimationFrame(glowRaf);
-    glowRaf = requestAnimationFrame(() => {
-      const r  = card.getBoundingClientRect();
-      const sx = (((e.clientX - r.left) / r.width)  * 100).toFixed(1) + '%';
-      const sy = (((e.clientY - r.top)  / r.height) * 100).toFixed(1) + '%';
-      card.style.setProperty('--sx', sx);
-      card.style.setProperty('--sy', sy);
-    });
-  }, { passive: true });
-
-  // §J3 — Inject spotlight div + stagger cards
-  function injectSpotlights(root) {
-    (root || document).querySelectorAll('.card:not([data-p])').forEach((card, i) => {
+  // §J2 — Card stagger + entry animation on render
+  function staggerCards(root) {
+    const cards = (root || document).querySelectorAll(
+      '.game-grid .card:not([data-p]), .discover-grid .card:not([data-p]), #list .card:not([data-p])'
+    );
+    cards.forEach((card, i) => {
       card.setAttribute('data-p', '1');
-      // Spotlight glow layer
-      if (!card.querySelector('.card-spotlight')) {
-        const sp = document.createElement('div');
-        sp.className = 'card-spotlight';
-        card.appendChild(sp);
-      }
-      // Staggered entry — capped at 380ms
-      const delay = Math.min(i * 30, 380);
-      card.style.animationDelay = delay + 'ms';
-      card.style.animationName  = 'premiumCardEnter';
-      card.style.animationDuration = '0.52s';
-      card.style.animationFillMode = 'both';
-      card.style.animationTimingFunction = 'cubic-bezier(0.16,1,0.30,1)';
+      const delay = Math.min(i * 28, 350) + 'ms';
+      card.style.cssText += ';animation-name:premiumCardEnter;animation-duration:0.50s;animation-delay:' + delay + ';animation-fill-mode:both;animation-timing-function:cubic-bezier(0.16,1,0.30,1)';
     });
   }
 
-  // §J4 — Observe grids for dynamic re-renders
+  // §J3 — Touch ripple feedback on cards
+  function addTouchFeedback() {
+    document.addEventListener('touchstart', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      card.classList.add('p-tapped');
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      setTimeout(() => card.classList.remove('p-tapped'), 180);
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', (e) => {
+      const card = e.target.closest('.card');
+      if (card) card.classList.remove('p-tapped');
+    }, { passive: true });
+  }
+
+  // §J4 — Observe grids for re-renders
   const observer = new MutationObserver((muts) => {
-    let hasCards = false;
-    muts.forEach(m => {
-      m.addedNodes.forEach(n => {
-        if (n.nodeType === 1 && (n.classList?.contains('card') || n.querySelector?.('.card'))) {
-          hasCards = true;
-        }
-      });
-    });
-    if (hasCards) requestAnimationFrame(() => injectSpotlights());
+    let newCards = false;
+    muts.forEach(m => m.addedNodes.forEach(n => {
+      if (n.nodeType === 1 && (n.classList?.contains('card') || n.querySelector?.('.card')))
+        newCards = true;
+    }));
+    if (newCards) requestAnimationFrame(() => staggerCards());
   });
 
   document.querySelectorAll('.game-grid, .discover-grid, #list, #discover-list').forEach(g => {
     observer.observe(g, { childList: true });
   });
 
-  // Also watch main for grid swaps
-  const mainEl = document.querySelector('#main, main, body');
-  if (mainEl) observer.observe(mainEl, { childList: true, subtree: true });
+  // §J5 — Initial run
+  setTimeout(() => staggerCards(), 60);
 
-  // §J5 — Initial injection after render
-  setTimeout(() => injectSpotlights(), 80);
+  // §J6 — Touch feedback
+  addTouchFeedback();
 
-  // §J6 — Pointer down visual feedback latency reduction
-  document.addEventListener('pointerdown', (e) => {
+  // §J7 — Smooth button press latency
+  document.addEventListener('touchstart', (e) => {
     const btn = e.target.closest('button:not([disabled])');
     if (btn) btn.style.willChange = 'transform';
   }, { passive: true });
-  document.addEventListener('pointerup', (e) => {
+  document.addEventListener('touchend', (e) => {
     const btn = e.target.closest('button');
-    if (btn) setTimeout(() => { btn.style.willChange = ''; }, 300);
+    if (btn) setTimeout(() => { btn.style.willChange = ''; }, 250);
   }, { passive: true });
 
 })();
